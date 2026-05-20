@@ -14,9 +14,10 @@ export default class ScreenHelper extends THREE.Object3D {
 		this.#screen = screen;
 
 		const corners = screen.corners;
+		corners.push( corners[ 1 ].clone( ).add( corners[ 2 ] ).sub( corners[ 0 ] ) );
 
-		const indices = [ 0, 1, 2,	1, 3, 2  ]
-		const vertices = new Float32Array([	...corners[0].toArray(), ...corners[1].toArray(), ...corners[2].toArray(), ...corners[3].toArray() ]);
+		const indices = [ 0, 1, 2,	1, 3, 2  ];
+		const vertices = new Float32Array( corners.map( corner => corner.toArray( ) ).flat( ) );
 
 		const geometry = new THREE.BufferGeometry( );
 		geometry.setAttribute( "position", new THREE.BufferAttribute( vertices, 3 ) );

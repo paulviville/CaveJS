@@ -1,45 +1,50 @@
 import * as THREE from '../three/three.module.js';
 import { Object3D, Group, Color } from '../three/three.module.js';
 import ScreenHelper from './ScreenHelper.js';
-// import StereoScreenCameraHelper from './StereoScreenCameraHelper.js';
+import ScreenCameraHelper from './ScreenCameraHelper.js';
 
 // const screenColors = [0x3399DD, 0xDD3399, 0x99DD33];
-const stereoScreenCameraColors = [0x1177BB, 0xBB1177, 0x77BB11];
+const screenCameraColors = [0x1177BB, 0xBB1177, 0x77BB11];
 const screenColors = [ 0xE6194B, 0x3CB44B, 0x4363D8, 0xF58231, 0x911EB4, 0x46F0F0, 0xF032E6, 0xBCF60C, 0xFABEBE, 0x008080 ];
 export default class CaveHelper extends Object3D {
 	#cave;
 	#screenHelpers;
-	// #stereoScreenCameraHelpers;
+	#screenCameraHelpers;
 	#axesHelper;
 
 	constructor ( cave ) {
 		super();
 
 		this.type = 'CaveHelper';
-		
 		this.#cave = cave;
+		this.#cave.setOnChange( ( position, rotation, scale ) => this.#updateTransforms( position, rotation, scale ) );
+		this.#initializeHelpers( );
 
+	}
+
+	#initializeHelpers ( ) {
 		this.#axesHelper = new THREE.AxesHelper( 1 );
 		this.add( this.#axesHelper );
 
-		this.#screenHelpers = new Group();
-		for(const screen of this.#cave.screens) {
-			this.#screenHelpers.add(new ScreenHelper(screen, screenColors.shift()));
-		}
-		this.add(this.#screenHelpers);
-
-		// this.#stereoScreenCameraHelpers = new Group();
-		// // for(const stereoScreenCamera of this.#cave.stereoScreenCameras) {
-		// // 	this.#stereoScreenCameraHelpers.add(new StereoScreenCameraHelper(stereoScreenCamera, new Color(stereoScreenCameraColors.shift())));
-		// // }
-		// this.add(this.#stereoScreenCameraHelpers);
+		this.#screenHelpers = new Group( );
+		this.#cave.screens.forEach( ( screen, i ) => {
+			this.#screenHelpers.add( new ScreenHelper( screen, screenColors[ i ] ) );
+		} );
+		this.add( this.#screenHelpers );
+		
+		this.#screenCameraHelpers = new Group( );
+		this.#cave.screenCameras.forEach( ( screenCamera, i ) => {
+			this.#screenCameraHelpers.add( new ScreenCameraHelper( screenCamera, new Color( screenCameraColors[ i ] ) ) );
+		} );
+		this.add(this.#screenCameraHelpers);
 	}
 
-	// updateStereoScreenCameraHelpers ( ) {
-	// 	for(const stereoScreenCameraHelper of this.#stereoScreenCameraHelpers.children) {
-	// 		stereoScreenCameraHelper.update();
-	// 	}
-	// }
+	updateScreenCameraHelpers ( ) {
+		for(const screenCameraHelper of this.#screenCameraHelpers.children) {
+			screenCameraHelper.update( );
+			console.log(screenCameraHelper)
+		}
+	}
 
 	// hideStereoScreenCameraHelpers ( ) {
 	// 	this.remove(this.#stereoScreenCameraHelpers);
@@ -60,5 +65,13 @@ export default class CaveHelper extends Object3D {
 		// for(const stereoScreenCameraHelper of this.#stereoScreenCameraHelpers.children) {
 		// 	stereoScreenCameraHelper.setLayer(layer);
 		// }
+	}
+
+	#updateTransforms ( position, rotation, scale ) {
+		console.log( `CaveHelper - #updateTransforms`);	
+
+		this.position.copy( position );
+		this.quaternion.copy( rotation );
+		this.scale.copy( scale );
 	}
 }
