@@ -42,7 +42,7 @@ export default class CaveWindow {
 	}
 	
 	open ( display = 0 ) {
-		this.#window = window.open(`./CaveJS/CaveWindow.html`, "", `width=${ this.#width }, height=${ this.#height }, left=${display * 1920}`);
+		this.#window = window.open(`./CaveJS/CaveWindow.html`, "", `width=${ this.#width }, height=${ this.#height }, left=${display * 100}`);
 		
 		
 		this.#window.addEventListener( "load", ( ) => this.#onLoad( ) );

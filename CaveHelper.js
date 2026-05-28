@@ -24,12 +24,12 @@ export default class CaveHelper extends Object3D {
 
 	#initializeHelpers ( ) {
 		this.#axesHelper = new THREE.AxesHelper( 1 );
-		this.add( this.#axesHelper );
 
 		this.#screenHelpers = new Group( );
 		this.#cave.screens.forEach( ( screen, i ) => {
 			this.#screenHelpers.add( new ScreenHelper( screen, screenColors[ i ] ) );
 		} );
+		this.#screenHelpers.add( this.#axesHelper );
 		this.add( this.#screenHelpers );
 		
 		this.#screenCameraHelpers = new Group( );
@@ -70,8 +70,8 @@ export default class CaveHelper extends Object3D {
 	#updateTransforms ( position, rotation, scale ) {
 		console.log( `CaveHelper - #updateTransforms`);	
 
-		this.position.copy( position );
-		this.quaternion.copy( rotation );
-		this.scale.copy( scale );
+		this.#screenHelpers.position.copy( position );
+		this.#screenHelpers.quaternion.copy( rotation );
+		this.#screenHelpers.scale.copy( scale );
 	}
 }

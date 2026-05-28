@@ -3,7 +3,6 @@ import { Matrix4, Vector3, PerspectiveCamera } from "three";
 
 export default class ScreenCamera {
 	#screen;
-	#corners = [ new Vector3( -1, -1, 0 ), new Vector3( 1, -1, 0 ), new Vector3( -1, 1, 0 ) ];
 	#transform = new Matrix4( );
 
 	#ss = {
@@ -58,8 +57,8 @@ export default class ScreenCamera {
 
 		this.#computeMatrices( this.#left );
 		this.#computeMatrices( this.#right );
-		console.log(this.#left)
-		console.log(this.#transform)
+		// console.log(this.#left)
+		// console.log(this.#transform)
 		this.#leftCamera.matrixWorldInverse.copy( this.#left.view );
 		this.#leftCamera.matrixWorld.copy( this.#left.view ).invert( );
 		this.#leftCamera.projectionMatrix.copy( this.#left.projection );
@@ -84,6 +83,7 @@ export default class ScreenCamera {
 
 	#computeScreenSpace ( ) {
 		const corners = this.#screen.corners;
+		corners.forEach( c => { c.applyMatrix4( this.#transform ); } );
 		this.#ss.X.copy( corners[ 1 ] ).sub( corners[ 0 ] ).normalize( );
 		this.#ss.Y.copy( corners[ 2 ] ).sub( corners[ 0 ] ).normalize( );
 		this.#ss.Z.crossVectors( this.#ss.X, this.#ss.Y ).normalize( );
@@ -93,6 +93,7 @@ export default class ScreenCamera {
 
 	#computeMatrices ( side ) {
 		const corners = this.#screen.corners;
+		corners.forEach( c => { c.applyMatrix4( this.#transform ); } );
 		corners.forEach( c => { c.sub( side.eye ); } );
 
 		const dist = - corners[ 0 ].dot( this.#ss.Z );

@@ -67,7 +67,7 @@ export default class Cave {
 	}
 
 	updateScreenCameras ( headMatrix ) {
-		this.#screenCameras.forEach( screenCamera => screenCamera.update( headMatrix ) );
-
+		const transfromedHeadMatrix = headMatrix.clone( ).premultiply( this.#transform );
+		this.#screenCameras.forEach( screenCamera => screenCamera.update( transfromedHeadMatrix ) );
 	}
 }
