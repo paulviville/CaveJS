@@ -28,7 +28,6 @@ export default class CaveRenderer {
 		this.setStereoMode( stereoMode );
 		this.#frameRate = frameRate;
 		this.#frameTime = 1000 / this.#frameRate;
-		console.log( this.#frameRate, this.#frameTime )
 	}
 
 	setAnimationLoop ( callback ) {

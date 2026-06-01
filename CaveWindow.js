@@ -28,7 +28,6 @@ export default class CaveWindow {
 	}
 
 	#onResize ( ) {
-		console.log( "CaveWindow - #onResize" );
 		this.#canvas.width = this.#window.innerWidth;
 		this.#canvas.height = this.#window.innerHeight;
 	}
