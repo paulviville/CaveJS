@@ -21,6 +21,9 @@ export default class CaveRenderer {
 	#animationRequest;
 	#animationLoop;
 
+	#preRenderCallback;
+	#postRenderCallback;
+
 	#skip;
 	#t0;
 	constructor ( cave, stereoMode = "Sequential", frameRate = 60 ) {
@@ -55,12 +58,20 @@ export default class CaveRenderer {
 		this.#scene = scene;
 	}
 
-	#preRender ( time, frame ) {
+	set preRender ( callback ) {
+		this.#preRenderCallback = callback;
+	}
 
+	set postRender ( callback ) {
+		this.#postRenderCallback = callback;
+	}
+
+	#preRender ( time, frame ) {
+		this.#preRenderCallback?.( );
 	}
 
 	#postRender ( time, frame ) {
-
+		this.#postRenderCallback?.( );
 	}
 
 	#renderSequential ( time, frame ) {
@@ -111,9 +122,9 @@ export default class CaveRenderer {
 
 		this.#skip = (frame % 2)
 
-		this.#preRender( );
+		this.#preRender( time, frame );
 		this.#render( time, frame );
-		this.#postRender( );
+		this.#postRender( time, frame );
 
 		this.#animationRequest = requestAnimationFrame( 
 			this.#onAnimationFrame.bind( this )

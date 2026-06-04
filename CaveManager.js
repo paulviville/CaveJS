@@ -14,7 +14,7 @@ export default class CaveManager {
 
 	constructor ( config ) {
 		this.initializeCave( config.screens );
-		this.initializeCaveRenderer( config.viewports, config.stereoMode );
+		this.initializeCaveRenderer( config.viewports, config.stereoMode, config.frameRate );
 		this.initializeWindows( config.windows );
 	}
 
@@ -30,9 +30,8 @@ export default class CaveManager {
 		this.#cave = new Cave( caveScreens );
 	}
 
-	initializeCaveRenderer ( viewports, stereoMode ) {
-		this.#caveRenderer = new CaveRenderer( this.#cave );
-		this.#caveRenderer.setStereoMode( stereoMode );
+	initializeCaveRenderer ( viewports, stereoMode, frameRate ) {
+		this.#caveRenderer = new CaveRenderer( this.#cave, stereoMode, frameRate );
 
 		for ( const viewportData of viewports ) {
 			this.#caveRenderer.addViewport( viewportData.id, viewportData );
