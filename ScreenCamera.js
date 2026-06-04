@@ -1,5 +1,5 @@
-import { Matrix4, Vector3, PerspectiveCamera } from "three";
-// import * as THREE from "../three/three.module.js";
+import { Matrix4, Vector3, PerspectiveCamera } from "../three/three.module.js";
+// import * as THREE from "../three/three.module.js"
 
 export default class ScreenCamera {
 	#screen;
@@ -51,14 +51,11 @@ export default class ScreenCamera {
 
 	update ( headMatrix ) {
 		this.#resetEyes( );
-		console.log(headMatrix)
 		this.#left.eye.applyMatrix4( headMatrix );
 		this.#right.eye.applyMatrix4( headMatrix );
 
 		this.#computeMatrices( this.#left );
 		this.#computeMatrices( this.#right );
-		// console.log(this.#left)
-		// console.log(this.#transform)
 		this.#leftCamera.matrixWorldInverse.copy( this.#left.view );
 		this.#leftCamera.matrixWorld.copy( this.#left.view ).invert( );
 		this.#leftCamera.projectionMatrix.copy( this.#left.projection );

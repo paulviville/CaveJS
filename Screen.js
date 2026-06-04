@@ -1,4 +1,5 @@
-import { Vector3, Matrix4 } from "three";
+// import { Vector3, Matrix4 } from "three";
+import { Vector3, Matrix4 } from "../three/three.module.js";
 
 ///		2 ------ 3
 ///     | Screen |
@@ -10,7 +11,7 @@ export default class Screen {
 	constructor ( corners ) {
 		this.#corners.forEach( ( _, i ) => { this.#corners[i].copy( corners[i] ); } );
 	}
-""
+
 	get corners ( ) {
 		return this.#corners.map( corner => corner.clone( ) );
 	}

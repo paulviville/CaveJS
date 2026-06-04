@@ -28,8 +28,11 @@ export default class CaveWindow {
 	}
 
 	#onResize ( ) {
-		this.#canvas.width = this.#window.innerWidth;
-		this.#canvas.height = this.#window.innerHeight;
+		// this.#canvas.width = this.#window.innerWidth;
+		// this.#canvas.height = this.#window.innerHeight;
+        console.log(this.#canvas)
+		this.#callbackFuncs.onResize?.( this.#window.innerWidth, this.#window.innerHeight );
+
 	}
 
 	async #fullscreen ( display ) {

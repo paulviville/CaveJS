@@ -1,4 +1,5 @@
-import * as THREE from 'three';
+import * as THREE from "../three/three.module.js";
+// import * as THREE from 'three';
 
 const STEREO_MODES = {
 	Sequential: 0,
@@ -42,12 +43,18 @@ export default class CaveRenderer {
 
 		const renderer = new THREE.WebGLRenderer( { canvas: canvas } );
 		renderer.setScissorTest(true);
-		
+		console.log(canvas)
 		
 		this.#renderers.set( id, renderer );
 
 		return renderer;
 	}
+
+    resizeCanvas ( id, width, height ) {
+        const canvas = this.#canvases.get( id );
+        canvas.width = width;
+        canvas.height = height;
+    }
 
 	/// viewport = { id, left, bottom, width, height, window }
 	addViewport ( id, viewport ) {
@@ -121,7 +128,7 @@ export default class CaveRenderer {
 			console.log(" skipped a frame ");
 
 		this.#skip = (frame % 2)
-
+        this.#cave.updateScreenCameras( );
 		this.#preRender( time, frame );
 		this.#render( time, frame );
 		this.#postRender( time, frame );

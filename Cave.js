@@ -1,4 +1,5 @@
-import * as THREE from "three";
+import * as THREE from "../three/three.module.js";
+// import * as THREE from "three";
 import ScreenCamera from "./ScreenCamera.js";
 
 export default class Cave {
@@ -6,12 +7,17 @@ export default class Cave {
 	#position = new THREE.Vector3( );
 	#rotation = new THREE.Quaternion( );
 	#scale = new THREE.Vector3( 1, 1, 1 );
-	#transform = new THREE.Matrix4( );
+	#transform = new THREE.Matrix4( ); 
+    #head = {
+        position: new THREE.Vector3( ),
+        quaternion: new THREE.Quaternion( ),
+        scale: new THREE.Vector3( 1, 1, 1 ),
+    }
+    #headMatrix = new THREE.Matrix4( );
 
-	#screenCameras = [ ];
+    #screenCameras = [ ];
 
 	#onChangeCallback = undefined;
-
 	constructor ( screens ) {
 		this.#screens.push( ...screens );
 
@@ -55,6 +61,11 @@ export default class Cave {
 		this.#onChange( );
 	}
 
+    setHead( position, quaternion ) {
+        this.#head.position.copy( position );
+        this.#head.quaternion.copy( quaternion );
+    }
+
 	setOnChange ( onChangeCallback ) {
 		this.#onChangeCallback = onChangeCallback;
 	}
@@ -67,7 +78,9 @@ export default class Cave {
 	}
 
 	updateScreenCameras ( headMatrix ) {
-		const transfromedHeadMatrix = headMatrix.clone( ).premultiply( this.#transform );
-		this.#screenCameras.forEach( screenCamera => screenCamera.update( transfromedHeadMatrix ) );
+        this.#headMatrix.compose( this.#head.position, this.#head.quaternion, this.#head.scale );
+        this.#headMatrix.premultiply( this.#transform );
+		// const transfromedHeadMatrix = headMatrix.clone( ).premultiply( this.#transform );
+		this.#screenCameras.forEach( screenCamera => screenCamera.update( this.#headMatrix ) );
 	}
 }

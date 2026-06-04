@@ -11,6 +11,7 @@ export default class CaveHelper extends Object3D {
 	#screenHelpers;
 	#screenCameraHelpers;
 	#axesHelper;
+    #arrowHelpers = new Group( );
 
 	constructor ( cave ) {
 		super();
@@ -36,13 +37,15 @@ export default class CaveHelper extends Object3D {
 		this.#cave.screenCameras.forEach( ( screenCamera, i ) => {
 			this.#screenCameraHelpers.add( new ScreenCameraHelper( screenCamera, new Color( screenCameraColors[ i ] ) ) );
 		} );
-		this.add(this.#screenCameraHelpers);
+		this.add( this.#screenCameraHelpers );
+
+        this.add( this.#arrowHelpers );
 	}
 
 	updateScreenCameraHelpers ( ) {
 		for(const screenCameraHelper of this.#screenCameraHelpers.children) {
 			screenCameraHelper.update( );
-			console.log(screenCameraHelper)
+			// console.log(screenCameraHelper)
 		}
 	}
 
@@ -73,5 +76,14 @@ export default class CaveHelper extends Object3D {
 		this.#screenHelpers.position.copy( position );
 		this.#screenHelpers.quaternion.copy( rotation );
 		this.#screenHelpers.scale.copy( scale );
+        this.#arrowHelpers.position.copy( position );
+		this.#arrowHelpers.quaternion.copy( rotation );
+		this.#arrowHelpers.scale.copy( scale );
 	}
+
+    addControler ( ) {
+        const arrow = new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 0.5, 0xFF5500);
+        this.#arrowHelpers.add( arrow );
+        return arrow;
+    }
 }

@@ -3,19 +3,24 @@ import Cave from './Cave.js';
 import CaveHelper from './CaveHelper.js';
 import CaveRenderer from './CaveRenderer.js';
 import CaveWindow from './CaveWindow.js';
-import * as THREE from 'three';
+// import * as THREE from 'three';
+import * as THREE from "../three/three.module.js";
+import Tracker from './Tracker.js';
 
 export default class CaveManager {
 	#cave;
 	#caveHelper;
 	#caveRenderer;
 	#windows;
-	#tracker; 
+	#tracker;
+    #worker;
 
-	constructor ( config ) {
+	constructor ( config, worker ) {
+        this.#worker = worker;
 		this.initializeCave( config.screens );
 		this.initializeCaveRenderer( config.viewports, config.stereoMode, config.frameRate );
 		this.initializeWindows( config.windows );
+        this.initializeTracking( config.vrpn )
 	}
 
 	initializeCave ( screens ) {
@@ -28,6 +33,7 @@ export default class CaveManager {
 		}
 
 		this.#cave = new Cave( caveScreens );
+        this.#caveHelper = new CaveHelper( this.#cave );
 	}
 
 	initializeCaveRenderer ( viewports, stereoMode, frameRate ) {
@@ -39,6 +45,11 @@ export default class CaveManager {
 	}
 
 	initializeWindows ( windows ) {
+        if ( this.#worker ) {
+            this.#initializeWorkerWindows( windows );
+            return;
+        }
+
 		this.#windows = new Map( );
 		for ( const windowData of windows ) {
 			const caveWindow = new CaveWindow(
@@ -62,6 +73,39 @@ export default class CaveManager {
 		} );
 	}
 
+    #initializeWorkerWindows ( windows ) {
+        console.log( "initializeWorkerWindows ")
+		for ( const windowData of windows ) {
+            this.#worker.postMessage( {
+                type: "addWindow",
+                windowData,
+            } );
+        }
+    }
+
+    initializeTracking ( vrpn ) {
+        this.#tracker = new Tracker( vrpn );
+        this.#tracker.setCallback( "head", ( position, quaternion ) => {
+            this.#cave.setHead( position, quaternion );
+        } );
+        if ( this.#tracker.has( "leftHand" ) ) {
+            const arrow = this.#caveHelper.addControler( );
+            this.#tracker.setCallback( "leftHand", ( position, quaternion ) => {
+                arrow.position.copy( position );
+                arrow.quaternion.copy( quaternion );
+                // console.log(position ,quaternion )
+            } );
+        }
+        if ( this.#tracker.has( "rightHand" ) ) {
+            const arrow = this.#caveHelper.addControler( );
+            this.#tracker.setCallback( "rightHand", ( position, quaternion ) => {
+                arrow.position.copy( position );
+                arrow.quaternion.copy( quaternion );
+                // console.log(position ,quaternion )
+            } );
+        }
+        this.#tracker.connect( );
+    }
 
 	get cave ( ) {
 		return this.#cave;
