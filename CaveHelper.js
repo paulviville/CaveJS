@@ -12,6 +12,7 @@ export default class CaveHelper extends Object3D {
 	#screenCameraHelpers;
 	#axesHelper;
     #arrowHelpers = new Group( );
+    #pointerHelpers = new Group( );
 
 	constructor ( cave ) {
 		super();
@@ -40,6 +41,7 @@ export default class CaveHelper extends Object3D {
 		this.add( this.#screenCameraHelpers );
 
         this.add( this.#arrowHelpers );
+        this.add( this.#pointerHelpers );
 	}
 
 	updateScreenCameraHelpers ( ) {
@@ -79,11 +81,21 @@ export default class CaveHelper extends Object3D {
         this.#arrowHelpers.position.copy( position );
 		this.#arrowHelpers.quaternion.copy( rotation );
 		this.#arrowHelpers.scale.copy( scale );
+        this.#pointerHelpers.position.copy( position );
+		this.#pointerHelpers.quaternion.copy( rotation );
+		this.#pointerHelpers.scale.copy( scale );
 	}
 
     addControler ( ) {
         const arrow = new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 0.5, 0xFF5500);
         this.#arrowHelpers.add( arrow );
         return arrow;
+    }
+
+    addPointer ( ) {
+        const point = new THREE.Mesh( new THREE.SphereGeometry( 0.02, 16, 15), new THREE.MeshBasicMaterial({color: 0xFF0000}))
+        
+        this.#pointerHelpers.add( point );
+        return point;
     }
 }

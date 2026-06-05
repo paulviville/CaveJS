@@ -19,7 +19,10 @@ class Signal {
     }
 
     get name ( ) {
-        return `${ this.#name }-${ this.#sensor }`;
+        let name = `${ this.#name }`;
+        if ( this.#sensor !== undefined )
+            name += `-${ this.#sensor }`;
+        return name;
     }
 }
 
@@ -42,20 +45,21 @@ class TrackerSignal extends Signal {
 
 class ButtonsSignal extends Signal {
 
-	constructor ( name ) {
-		super( name );
+	constructor ( name, sensor, mapping ) {
+		super( name, sensor );
 	}
 }
 
 class AnalogSignal extends Signal {
 	#vector = new THREE.Vector2( 0, 0 );
 
-	constructor ( name ) {
-		super( name );
+	constructor ( name, sensor ) {
+		super( name, sensor );
 	}
 
 	setVector ( x, y ) {
 		this.#vector.set( x, y );
+        console.log( this.name, x, y )
 		this.callback?.( this.#vector );
 	}
 }
@@ -66,11 +70,13 @@ export default class Tracker {
 
 	#signals = new Map( );
 	#trackers = new Map( );
-	#analogs;
-	#buttons;
+	#analogs = new Map( );
+	#buttons = new Map( );
 
 	constructor ( vrpn ) {
         this.#initializeTrackers( vrpn.trackers );
+        this.#initializeAnalogs( vrpn.analogs );
+        this.#initializeButtons( vrpn.buttons );
 	}
 
 	connect ( uri = "ws://localhost:8000" ) {
@@ -86,6 +92,22 @@ export default class Tracker {
             this.#addSignal( tracker.target, trackerSignal );
 		}
 	}
+
+    #initializeAnalogs ( analogs ) {
+        for ( const analog of analogs ) {
+            const analogSignal = new AnalogSignal( analog.signal, analog.sensor );
+            this.#analogs.set( analogSignal.name, analogSignal );
+            this.#addSignal( analog.target, analog );
+        }
+    }
+
+    #initializeButtons ( buttons ) {
+        for ( const button of buttons ) {
+            const buttonSignal = new ButtonsSignal( button.signal, button.sensor, button.mapping );
+            this.#buttons.set( buttonSignal.name, buttonSignal );
+            this.#addSignal( button.target, button );
+        }
+    }
 
     #addSignal ( target, signal ) {
             this.#signals.set( target, signal );
@@ -126,19 +148,39 @@ export default class Tracker {
 		tracker.setTransform( ...dataArray.map( x => parseFloat( x ) ) );
 	}
 
+	#handleButton ( dataArray ) {
+        const signal = dataArray.shift( );
+
+		const button = this.#buttons.get( signal );
+		if ( button === undefined ) {
+			console.warn( `button ${ signal } undefined` );
+			return;
+		}
+			// console.warn( `button ${ signal } undefined` );
+            console.log(button)
+
+		// button.setTransform( ...dataArray.map( x => parseFloat( x ) ) );
+	}
+
+	#handleAnalog ( dataArray ) {
+        const signal = dataArray.shift( );
+
+		const analog = this.#analogs.get( signal );
+		if ( analog === undefined ) {
+			console.warn( `analog ${ signal } undefined` );
+			return;
+		}
+			// console.warn( `analog ${ signal } undefined` );
+            // console.log(analog)
+
+		analog.setVector( ...dataArray.map( x => parseFloat( x ) ) );
+	}
+
     setCallback ( target, callback ) {
         const targetSignal = this.#signals.get( target );
         if ( targetSignal )
             targetSignal.callback = callback;
     }
-
-	#handleButton ( dataArray ) {
-        console.log("button", dataArray)
-	}
-
-	#handleAnalog ( dataArray ) {
-        console.log("analog", dataArray)
-	}
 
     has ( target ) {
         return ( this.#signals.get( target ) !== undefined );

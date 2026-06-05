@@ -3,7 +3,6 @@ import Cave from './Cave.js';
 import CaveHelper from './CaveHelper.js';
 import CaveRenderer from './CaveRenderer.js';
 import CaveWindow from './CaveWindow.js';
-// import * as THREE from 'three';
 import * as THREE from "../three/three.module.js";
 import Tracker from './Tracker.js';
 
@@ -88,12 +87,41 @@ export default class CaveManager {
         this.#tracker.setCallback( "head", ( position, quaternion ) => {
             this.#cave.setHead( position, quaternion );
         } );
+        
         if ( this.#tracker.has( "leftHand" ) ) {
             const arrow = this.#caveHelper.addControler( );
+            // const point = this.#caveHelper.addPointer( );
+            // const [ A, B, C, D ] = this.#cave.screens[ 0 ].corners;
+            // const AB = B.clone( ).sub( A );
+            // const AC = C.clone( ).sub( A );
+            // const WX = AB.length( );
+            // const WY = AC.length( );
+            // const nAB = AB.clone( ).normalize( );
+            // const nAC = AC.clone( ).normalize( );
+            // const n = nAB.clone( ).cross( nAC )
+
             this.#tracker.setCallback( "leftHand", ( position, quaternion ) => {
+                // const [ qx, qy, qz, qw ] = quaternion.toArray( );
+                // const rx = - 2 * ( qw * qz - qy * qx );
+                // const ry = 1 - 2 * ( qz * qz + qx * qx );
+                // const rz = 2 * ( qw * qx + qy * qz );
+            
+                // const R = new THREE.Vector3( rx, ry, rz );
+
+                // const AP = position.clone( ).sub( A );
+                // const dist = AP.dot( n ) / -( R.dot( n ) );
+                // const I = position.clone( ).addScaledVector( R,  dist )
+                // const AI = I.clone( ).sub( A );
+                // const Wx = AI.dot( nAB ) / WX;
+                // const Wy = AI.dot( nAC ) / WY;
+                // point.position.copy( position ).addScaledVector( R,  dist );
+
+                // if( Wx <= 0 || Wx >= 1 || Wy <= 0 || Wy >= 1 ) {
+                //     point.position.multiplyScalar( 0 );
+                // }
+
                 arrow.position.copy( position );
                 arrow.quaternion.copy( quaternion );
-                // console.log(position ,quaternion )
             } );
         }
         if ( this.#tracker.has( "rightHand" ) ) {
