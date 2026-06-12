@@ -158,6 +158,7 @@ export default class Tracker {
 		}
 			// console.warn( `button ${ signal } undefined` );
             console.log(button)
+            console.log(dataArray)
 
 		// button.setTransform( ...dataArray.map( x => parseFloat( x ) ) );
 	}

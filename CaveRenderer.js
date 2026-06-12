@@ -90,7 +90,7 @@ export default class CaveRenderer {
 			renderer.setViewport(viewport.left, viewport.bottom, viewport.width, viewport.height);
 			renderer.setScissor(viewport.left, viewport.bottom, viewport.width, viewport.height);
 			
-			renderer.render( this.#scene, ( frame % 2 ) ? screenCamera.left : screenCamera.right );
+			renderer.render( this.#scene, ( frame % 2 ) ? screenCamera.right : screenCamera.left );
 		}
 	}
 
