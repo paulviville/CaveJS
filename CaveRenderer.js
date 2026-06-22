@@ -26,6 +26,7 @@ export default class CaveRenderer {
 	#postRenderCallback;
 
 	#skip;
+    #frameOffset = 0;
 	#t0;
 	constructor ( cave, stereoMode = "Sequential", frameRate = 60 ) {
 		this.#cave = cave;
@@ -90,7 +91,7 @@ export default class CaveRenderer {
 			renderer.setViewport(viewport.left, viewport.bottom, viewport.width, viewport.height);
 			renderer.setScissor(viewport.left, viewport.bottom, viewport.width, viewport.height);
 			
-			renderer.render( this.#scene, ( frame % 2 ) ? screenCamera.right : screenCamera.left );
+			renderer.render( this.#scene, ( frame % 2 ) ? screenCamera.left : screenCamera.right );
 		}
 	}
 
@@ -121,8 +122,12 @@ export default class CaveRenderer {
 		}
 	}
 
+    offsetFrame ( ) {
+        this.#frameOffset = ( this.#frameOffset + 1 ) % 2;
+    }
+
 	#onAnimationFrame ( time ) {
-		const frame = Math.floor( ( time - this.#t0 ) / this.#frameTime );
+		const frame = Math.floor( ( time - this.#t0 ) / this.#frameTime ) + this.#frameOffset;
 		
 		if ( this.#skip == ( frame % 2) )
 			console.log(" skipped a frame ");

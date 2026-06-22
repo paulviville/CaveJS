@@ -44,10 +44,30 @@ class TrackerSignal extends Signal {
 }
 
 class ButtonsSignal extends Signal {
+    #mapping = new Map( );
+    #callbacksMap;
 
-	constructor ( name, sensor, mapping ) {
+	constructor ( name, sensor, mapping = { }) {
 		super( name, sensor );
+
+        for ( const value in mapping ) {
+            this.#mapping.set( parseInt( value ), mapping[ value ] );
+        }
+        console.log(this.#mapping)
 	}
+
+    set callbacksMap ( callbacksMap ) {
+        this.#callbacksMap = callbacksMap;
+        for ( const [ _, key ] of this.#mapping ) {
+            this.#callbacksMap.set( key, undefined );
+        }
+    }
+
+    on ( value, state ) {
+        const mappedKey = this.#mapping.get( value );
+        const callback = this.#callbacksMap.get( mappedKey );
+        callback?.( state );
+    }
 }
 
 class AnalogSignal extends Signal {
@@ -59,19 +79,18 @@ class AnalogSignal extends Signal {
 
 	setVector ( x, y ) {
 		this.#vector.set( x, y );
-        console.log( this.name, x, y )
 		this.callback?.( this.#vector );
 	}
 }
 
 export default class Tracker {
 	#socket;
-	#callbacks;
 
 	#signals = new Map( );
 	#trackers = new Map( );
 	#analogs = new Map( );
 	#buttons = new Map( );
+    #buttonsCallbacks = new Map( );
 
 	constructor ( vrpn ) {
         this.#initializeTrackers( vrpn.trackers );
@@ -80,7 +99,7 @@ export default class Tracker {
 	}
 
 	connect ( uri = "ws://localhost:8000" ) {
-        console.log("trakcing")
+        console.log("tracking")
 		this.#socket = new WebSocket( uri );
 		this.#socket.addEventListener( "message", this.#handleMessage.bind(this) );
 	}
@@ -106,6 +125,7 @@ export default class Tracker {
             const buttonSignal = new ButtonsSignal( button.signal, button.sensor, button.mapping );
             this.#buttons.set( buttonSignal.name, buttonSignal );
             this.#addSignal( button.target, button );
+            buttonSignal.callbacksMap = this.#buttonsCallbacks;
         }
     }
 
@@ -142,8 +162,6 @@ export default class Tracker {
 			console.warn( `tracker ${ signal } undefined` );
 			return;
 		}
-			// console.warn( `tracker ${ signal } undefined` );
-            // console.log(tracker)
 
 		tracker.setTransform( ...dataArray.map( x => parseFloat( x ) ) );
 	}
@@ -156,11 +174,10 @@ export default class Tracker {
 			console.warn( `button ${ signal } undefined` );
 			return;
 		}
-			// console.warn( `button ${ signal } undefined` );
-            console.log(button)
-            console.log(dataArray)
-
-		// button.setTransform( ...dataArray.map( x => parseFloat( x ) ) );
+        // console.log( signal )
+        // console.log(button)
+        // console.log(dataArray)
+        button.on( ...dataArray.map( x => parseInt( x ) ) );
 	}
 
 	#handleAnalog ( dataArray ) {
@@ -171,8 +188,6 @@ export default class Tracker {
 			console.warn( `analog ${ signal } undefined` );
 			return;
 		}
-			// console.warn( `analog ${ signal } undefined` );
-            // console.log(analog)
 
 		analog.setVector( ...dataArray.map( x => parseFloat( x ) ) );
 	}
@@ -181,6 +196,14 @@ export default class Tracker {
         const targetSignal = this.#signals.get( target );
         if ( targetSignal )
             targetSignal.callback = callback;
+    }
+
+    /// mapped buttons: LeftTrigger, Left0..3, RightTrigger, Right0...3
+    setButtonCallback ( key, callback ) {
+        if ( this.#buttonsCallbacks.has( key ) )
+            this.#buttonsCallbacks.set( key, callback );
+        else 
+            console.warn( `unmapped key` );
     }
 
     has ( target ) {

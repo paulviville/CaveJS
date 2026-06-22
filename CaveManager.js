@@ -102,6 +102,22 @@ export default class CaveManager {
                 arrow.quaternion.copy( quaternion );
             } );
         }
+
+        this.#tracker.setButtonCallback( "LeftTrigger", ( state ) =>  { console.log( "LeftTrigger", state )} );
+        this.#tracker.setButtonCallback( "Left0", ( state ) =>  { console.log( "Left0", state )} );
+        this.#tracker.setButtonCallback( "Left1", ( state ) =>  { console.log( "Left1", state )} );
+        this.#tracker.setButtonCallback( "Left2", ( state ) =>  { console.log( "Left2", state )} );
+        this.#tracker.setButtonCallback( "Left3", ( state ) =>  { 
+            console.log( "Left3", state );
+            this.#caveRenderer.offsetFrame( ); 
+        } );
+
+        this.#tracker.setButtonCallback( "RightTrigger", ( state ) =>  { console.log( "RightTrigger", state )} );
+        this.#tracker.setButtonCallback( "Right0", ( state ) =>  { console.log( "Right0", state )} );
+        this.#tracker.setButtonCallback( "Right1", ( state ) =>  { console.log( "Right1", state )} );
+        this.#tracker.setButtonCallback( "Right2", ( state ) =>  { console.log( "Right2", state )} );
+        this.#tracker.setButtonCallback( "Right3", ( state ) =>  { console.log( "Right3", state )} );
+
         this.#tracker.connect( );
     }
 
