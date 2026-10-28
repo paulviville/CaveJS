@@ -121,6 +121,10 @@ export default class CaveManager {
         this.#tracker.connect( );
     }
 
+    // setTrackingCallbacks ( callbacksMap ) {
+
+    // }
+
 	get cave ( ) {
 		return this.#cave;
 	}
@@ -136,7 +140,11 @@ export default class CaveManager {
 		return this.#caveRenderer;
 	}
 
-	#onReady ( ) {
+    get tracker ( ) {
+        return this.#tracker;
+    }
+
+ 	#onReady ( ) {
 		let ready = true;
 		this.#windows.forEach( window => { ready &= window.ready; } );
 		if ( !ready ) {

@@ -46,6 +46,12 @@ export default class Cave {
 		return this.#scale.clone( );
 	}
 
+    get transform ( ) {
+        const transform = new THREE.Matrix4( );
+        transform.compose( this.#position, this.#rotation, this.#scale );
+        return transform;
+    }
+
 	set position ( position ) {
 		this.#position.copy( position );
 		this.#onChange( );

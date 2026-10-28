@@ -4,6 +4,7 @@ class Signal {
 	#name;
 	#sensor;
 	#callback;
+    #callbacks = [ ];
 
 	constructor ( name, sensor ) {
 		this.#name = name;
@@ -18,6 +19,14 @@ class Signal {
         return this.#callback;
     }
 
+    setCallback ( callback ) {
+        this.#callbacks.push( callback );
+    }
+
+    get callbacks ( ) {
+        return this.#callbacks;
+    }
+
     get name ( ) {
         let name = `${ this.#name }`;
         if ( this.#sensor !== undefined )
@@ -30,7 +39,6 @@ class TrackerSignal extends Signal {
 	#position = new THREE.Vector3( 0, 0, 0 );
 	#quaternion = new THREE.Quaternion( 0, 0, 0, 1 );
 
-
 	constructor ( name, sensor ) {
 		super( name, sensor );
 	}
@@ -39,7 +47,11 @@ class TrackerSignal extends Signal {
 		this.#position.set( x, y, z );
 		this.#quaternion.set( qx, qy, qz, qw );
 
-		this.callback?.( this.#position, this.#quaternion );
+		// this.callback?.( this.#position, this.#quaternion );
+
+        this.callbacks.forEach( ( callback ) => {
+            callback( this.#position, this.#quaternion )
+        } ); 
 	}
 }
 
@@ -130,7 +142,7 @@ export default class Tracker {
     }
 
     #addSignal ( target, signal ) {
-            this.#signals.set( target, signal );
+        this.#signals.set( target, signal );
     }
 
 	#handleMessage ( message ) {
@@ -174,9 +186,6 @@ export default class Tracker {
 			console.warn( `button ${ signal } undefined` );
 			return;
 		}
-        // console.log( signal )
-        // console.log(button)
-        // console.log(dataArray)
         button.on( ...dataArray.map( x => parseInt( x ) ) );
 	}
 
@@ -194,8 +203,10 @@ export default class Tracker {
 
     setCallback ( target, callback ) {
         const targetSignal = this.#signals.get( target );
-        if ( targetSignal )
-            targetSignal.callback = callback;
+        if ( targetSignal ) {
+            // targetSignal.callback = callback;
+            targetSignal.setCallback( callback );
+        }
     }
 
     /// mapped buttons: LeftTrigger, Left0..3, RightTrigger, Right0...3
